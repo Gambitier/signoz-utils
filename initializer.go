@@ -54,7 +54,8 @@ func InitTracer(collectorURL string, serviceName string, insecure string) Tracer
 	meter := meterProvider.Meter(tracer.serviceName)
 	tracer.meter = meter
 
-	tracer.generateMetrics()
+	// Set the global meter provider
+	otel.SetMeterProvider(meterProvider)
 
 	return tracer
 }
@@ -166,13 +167,4 @@ func (t *tracer) initMeter() *metricsdk.MeterProvider {
 	)
 
 	return provider
-}
-
-func (t *tracer) generateMetrics() {
-	go exceptionsCounter(t.meter)
-	go pageFaultsCounter(t.meter)
-	go requestDurationHistogram(t.meter)
-	go roomTemperatureGauge(t.meter)
-	go itemsInQueueUpDownCounter(t.meter)
-	go processHeapSizeUpDownCounter(t.meter)
 }
